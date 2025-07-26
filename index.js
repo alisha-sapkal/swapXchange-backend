@@ -9,7 +9,7 @@ connectDB();
 const app = express();
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -26,6 +26,10 @@ app.use((err, req, res, next) => {
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
+});
+
+app.get('/', (req, res) => {
+  res.send('<h1>Welcome to the SwapXchange Backend API!</h1><p>Status: Running</p>');
 });
 
 app.use((req, res) => {
