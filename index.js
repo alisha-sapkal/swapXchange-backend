@@ -8,8 +8,20 @@ connectDB();
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://swap-xchange-ui-c5jf.vercel.app/'
+];
+
 app.use(cors({
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: function(origin, callback){
+    if(!origin) return callback(null, true);
+    if(allowedOrigins.indexOf(origin) === -1){
+      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -20,12 +32,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', require('./routes/auth'));
 
-// Root welcome route for deployed screen
 app.get('/', (req, res) => {
   res.send('<h1>Welcome to the SwapXchange Backend API!</h1><p>Status: Running</p>');
 });
 
-// 404 handler for all other routes
 app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
