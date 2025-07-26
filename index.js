@@ -20,20 +20,22 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', require('./routes/auth'));
 
+// Root welcome route for deployed screen
+app.get('/', (req, res) => {
+  res.send('<h1>Welcome to the SwapXchange Backend API!</h1><p>Status: Running</p>');
+});
+
+// 404 handler for all other routes
+app.use((req, res) => {
+  res.status(404).json({ message: 'Route not found' });
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
-});
-
-app.get('/', (req, res) => {
-  res.send('<h1>Welcome to the SwapXchange Backend API!</h1><p>Status: Running</p>');
-});
-
-app.use((req, res) => {
-  res.status(404).json({ message: 'Route not found' });
 });
 
 const PORT = process.env.PORT || 3000;
